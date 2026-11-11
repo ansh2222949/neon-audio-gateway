@@ -60,8 +60,8 @@ stremioRouter.get('/catalog/music/:catalogId/:extra?.json', async (c) => {
 });
 
 // Stremio Meta Handler
-stremioRouter.get('/meta/music/:id.json', async (c) => {
-  const rawId = c.req.param('id');
+stremioRouter.get('/meta/music/:id', async (c) => {
+  const rawId = String(c.req.param('id') || '');
   const songId = rawId.replace(/^neon:/, '').replace(/\.json$/, '');
 
   const cacheKey = `stremio:meta:${songId}`;
@@ -89,8 +89,8 @@ stremioRouter.get('/meta/music/:id.json', async (c) => {
 });
 
 // Stremio Stream Handler
-stremioRouter.get('/stream/music/:id.json', async (c) => {
-  const rawId = c.req.param('id');
+stremioRouter.get('/stream/music/:id', async (c) => {
+  const rawId = String(c.req.param('id') || '');
   const songId = rawId.replace(/^neon:/, '').replace(/\.json$/, '');
 
   const cacheKey = `stremio:stream:${songId}`;
