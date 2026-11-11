@@ -1,0 +1,9 @@
+name = "neon-audio-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ADDON_NAME = "Neon Audio Gateway"
+ADDON_ID = "org.neonsong.audio.gateway"
+DEFAULT_QUALITY = "320"

@@ -1,0 +1,38 @@
+{
+  "name": "neon-audio-gateway",
+  "version": "1.0.0",
+  "description": "High-performance modular audio gateway & streaming resolver for Neon Song and Stremio",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "music",
+    "streaming",
+    "320kbps",
+    "neonsong",
+    "stremio",
+    "jiosaavn",
+    "cloudflare-workers",
+    "hono",
+    "aac"
+  ],
+  "author": "Ansh Shrivastava <ansh2222949@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241106.0",
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3",
+    "wrangler": "^3.90.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
