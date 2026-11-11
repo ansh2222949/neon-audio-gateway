@@ -256,3 +256,70 @@ export function toStremioStream(stream: NeonStreamResponse, trackTitle?: string)
     url: stream.url,
   };
 }
+
+/**
+ * Retrieve full song details by ID.
+ */
+export async function getSongDetails(songId: string, quality: AudioQuality = '320'): Promise<NeonSongTrack | null> {
+  const cleanId = songId.trim();
+  if (!cleanId) return null;
+
+  const url = new URL(JIOSAAVN_ENDPOINT);
+  url.searchParams.set('__call', 'song.getDetails');
+  url.searchParams.set('_format', 'json');
+  url.searchParams.set('_marker', '0');
+  url.searchParams.set('api_version', '4');
+  url.searchParams.set('ctx', 'web6dot0');
+  url.searchParams.set('pids', cleanId);
+
+  const res = await fetch(url.toString(), {
+    headers: {
+      'User-Agent': getRandomUserAgent(),
+      Accept: 'application/json, text/plain, */*',
+    },
+  });
+
+  if (!res.ok) return null;
+  const rawData = (await res.json()) as Record<string, any>;
+  let song: JioSaavnSongRaw | null = null;
+  if (Array.isArray(rawData?.songs) && rawData.songs.length > 0) {
+    song = rawData.songs[0];
+  } else if (rawData?.[cleanId]) {
+    song = rawData[cleanId];
+  }
+  return song ? formatTrack(song, quality) : null;
+}
+
+/**
+ * Fetch top trending/viral tracks for the home feed.
+ */
+export async function getTrendingTracks(quality: AudioQuality = '320'): Promise<NeonSongTrack[]> {
+  try {
+    const url = new URL(JIOSAAVN_ENDPOINT);
+    url.searchParams.set('__call', 'playlist.getDetails');
+    url.searchParams.set('_format', 'json');
+    url.searchParams.set('_marker', '0');
+    url.searchParams.set('api_version', '4');
+    url.searchParams.set('ctx', 'web6dot0');
+    url.searchParams.set('listid', '902306817');
+
+    const res = await fetch(url.toString(), {
+      headers: {
+        'User-Agent': getRandomUserAgent(),
+        Accept: 'application/json, text/plain, */*',
+      },
+    });
+
+    if (res.ok) {
+      const data = (await res.json()) as any;
+      const list = data?.list || [];
+      if (Array.isArray(list) && list.length > 0) {
+        return list.map((item: JioSaavnSongRaw) => formatTrack(item, quality));
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch trending playlist, fallback to search:', err);
+  }
+
+  return searchTracks('Trending Songs', quality, 20);
+}

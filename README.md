@@ -42,15 +42,15 @@ Traditional streaming addons and resolvers rely on slow, memory-intensive script
 ### Option 1: 1-Click Deploy to Cloudflare Workers (Recommended)
 
 1. Click the button below:  
-   [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ansh2222949/neon-music-addon)
+   [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ansh2222949/neon-audio-gateway)
 2. Log into your free Cloudflare account.
-3. Your worker will be deployed to a global edge domain like `https://neon-music-addon.<your-subdomain>.workers.dev`.
+3. Your worker will be deployed to a global edge domain like `https://neon-audio-gateway.<your-subdomain>.workers.dev`.
 
 ### Option 2: Deploy via Wrangler CLI
 
 ```bash
-git clone https://github.com/ansh2222949/neon-music-addon.git
-cd neon-music-addon
+git clone https://github.com/ansh2222949/neon-audio-gateway.git
+cd neon-audio-gateway
 npm install
 npx wrangler deploy
 ```
@@ -70,14 +70,14 @@ npx vercel --prod
 2. Go to **Settings → Modules & Addons**.
 3. Under **Custom Addon URL**, paste your deployed domain:
    ```text
-   https://neon-music-addon.<your-worker>.workers.dev/manifest.json
+   https://neon-audio-gateway.<your-worker>.workers.dev/manifest.json
    ```
-4. Neon Song will instantly verify the manifest and stream 320kbps tracks!
+4. Neon Song will instantly verify the manifest and stream 320kbps tracks with synced lyrics and trending charts!
 
 ### 2. In Stremio (Desktop / Android / TV)
 1. In your browser or Stremio app, enter:
    ```text
-   stremio://neon-music-addon.<your-worker>.workers.dev/manifest.json
+   stremio://neon-audio-gateway.<your-worker>.workers.dev/manifest.json
    ```
 2. Click **Install**.
 3. Search for any song in the Music tab to stream 320kbps audio.
@@ -88,11 +88,15 @@ npx vercel --prod
 
 | Method | Endpoint | Description | Cache |
 |---|---|---|---|
-| `GET` | `/` | Cyberpunk Web Dashboard & Live Audio Player | 1 Hour |
+| `GET` | `/` | Cyberpunk Liquid Glass Web Dashboard & Audio Player | 1 Hour |
 | `GET` | `/health` | Service health, cipher engine & latency telemetry | No-cache |
 | `GET` | `/manifest.json` | Dual Neon Song & Stremio Addon Manifest | 24 Hours |
-| `GET` | `/search?q={query}&quality={320\|160\|96}` | Search tracks (returns JSON track schema) | 24 Hours |
+| `GET` | `/search?q={query}&quality={320\|160\|96}` | Search tracks (returns Neon Song JSON schema) | 24 Hours |
+| `GET` | `/trending` | Fetch trending & top weekly charts | 1 Hour |
+| `GET` | `/lyrics?track={title}&artist={artist}` | Fetch synchronized LRC and plain lyrics | 24 Hours |
+| `GET` | `/lyrics/:id` | Fetch synced lyrics by song ID | 24 Hours |
 | `GET` | `/stream/:id?quality={320\|160\|96}` | Resolve direct 320kbps CDN playback URL | 24 Hours |
+| `GET` | `/download/:id?quality={320\|160\|96}` | Direct 320kbps audio download link | 24 Hours |
 | `GET` | `/catalog/music/:catalogId/:extra.json` | Stremio catalog search endpoint | 24 Hours |
 | `GET` | `/meta/music/:id.json` | Stremio track metadata endpoint | 24 Hours |
 | `GET` | `/stream/music/:id.json` | Stremio stream resolution endpoint | 24 Hours |
@@ -121,8 +125,8 @@ npx vercel --prod
 
 ```bash
 # Clone the repository
-git clone https://github.com/ansh2222949/neon-music-addon.git
-cd neon-music-addon
+git clone https://github.com/ansh2222949/neon-audio-gateway.git
+cd neon-audio-gateway
 
 # Install dependencies
 npm install

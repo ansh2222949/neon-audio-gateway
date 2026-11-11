@@ -108,3 +108,22 @@ export interface JioSaavnSearchResponse {
   start: number;
   results: JioSaavnSongRaw[];
 }
+
+export interface LyricsResponse {
+  id?: string;
+  trackName: string;
+  artistName: string;
+  albumName?: string;
+  duration?: number;
+  syncedLyrics?: string;
+  plainLyrics?: string;
+  hasSynced: boolean;
+}
+
+export interface TrendingPlaylist {
+  id: string;
+  title: string;
+  subtitle?: string;
+  image?: string;
+  tracks: NeonSongTrack[];
+}

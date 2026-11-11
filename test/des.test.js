@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { decryptJioSaavnUrl } from '../src/crypto/des.js';
-import { applyQualityToCdnUrl, sanitizeText, upscaleArtwork } from '../src/services/jiosaavn.js';
+import { decryptJioSaavnUrl } from '../src/crypto/des.ts';
+import { applyQualityToCdnUrl, sanitizeText, upscaleArtwork } from '../src/services/jiosaavn.ts';
 
 test('DES Decryption should accurately decrypt JioSaavn media URLs', () => {
   const cipher = 'ID2ieOjCrwfgWvL5sXl4B1ImC5QfbsDyj4ZDyRkajGN2q4KeBCxtREh4spXbqfrBgV8FtvB9QO2H160XU/sCaBw7tS9a8Gtq';
