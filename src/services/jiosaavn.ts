@@ -124,41 +124,101 @@ export function applyQualityToCdnUrl(baseCdnUrl: string, quality: AudioQuality):
 }
 
 /**
- * Search JioSaavn catalog by query.
+ * Search JioSaavn catalog by query with intelligent multi-entity resolution.
+ * If query matches an artist (e.g. Ado, 9lane/9lana, Arijit Singh), the artist's
+ * top hit tracks are fetched and prioritized at the top of results.
  */
 export async function searchTracks(
   query: string,
   quality: AudioQuality = '320',
-  limit: number = 20,
+  limit: number = 25,
   page: number = 1
 ): Promise<NeonSongTrack[]> {
   const cleanQ = query.trim();
   if (!cleanQ) return [];
 
-  const url = new URL(JIOSAAVN_ENDPOINT);
-  url.searchParams.set('__call', 'search.getResults');
-  url.searchParams.set('_format', 'json');
-  url.searchParams.set('_marker', '0');
-  url.searchParams.set('api_version', '4');
-  url.searchParams.set('ctx', 'web6dot0');
-  url.searchParams.set('p', String(page));
-  url.searchParams.set('n', String(limit));
-  url.searchParams.set('q', cleanQ);
+  // Handle common phonetic/spelling aliases
+  const normalizedQuery = cleanQ.toLowerCase().replace(/[^a-z0-9]/g, '') === '9lane' ? '9lana' : cleanQ;
+  const qLower = normalizedQuery.toLowerCase();
 
-  const res = await fetch(url.toString(), {
-    headers: {
-      'User-Agent': getRandomUserAgent(),
-      Accept: 'application/json, text/plain, */*',
-    },
-  });
+  // 1. Prepare song search URL
+  const trackUrl = new URL(JIOSAAVN_ENDPOINT);
+  trackUrl.searchParams.set('__call', 'search.getResults');
+  trackUrl.searchParams.set('_format', 'json');
+  trackUrl.searchParams.set('_marker', '0');
+  trackUrl.searchParams.set('api_version', '4');
+  trackUrl.searchParams.set('ctx', 'web6dot0');
+  trackUrl.searchParams.set('p', String(page));
+  trackUrl.searchParams.set('n', String(limit));
+  trackUrl.searchParams.set('q', normalizedQuery);
 
-  if (!res.ok) {
-    throw new Error(`JioSaavn search failed with HTTP ${res.status}`);
+  // 2. Prepare artist search URL (first page only for artist hits)
+  const artistUrl = new URL(JIOSAAVN_ENDPOINT);
+  artistUrl.searchParams.set('__call', 'search.getArtistResults');
+  artistUrl.searchParams.set('_format', 'json');
+  artistUrl.searchParams.set('_marker', '0');
+  artistUrl.searchParams.set('api_version', '4');
+  artistUrl.searchParams.set('ctx', 'web6dot0');
+  artistUrl.searchParams.set('p', '1');
+  artistUrl.searchParams.set('n', '10');
+  artistUrl.searchParams.set('q', normalizedQuery);
+
+  const [trackRes, artistRes] = await Promise.all([
+    fetch(trackUrl.toString(), {
+      headers: { 'User-Agent': getRandomUserAgent(), Accept: 'application/json, text/plain, */*' },
+    }).then(r => (r.ok ? r.json() : null)).catch(() => null),
+    page === 1
+      ? fetch(artistUrl.toString(), {
+          headers: { 'User-Agent': getRandomUserAgent(), Accept: 'application/json, text/plain, */*' },
+        }).then(r => (r.ok ? r.json() : null)).catch(() => null)
+      : Promise.resolve(null),
+  ]);
+
+  const rawSongResults: JioSaavnSongRaw[] = (trackRes as any)?.results || [];
+  const artists: Array<{ id: string; name?: string; title?: string }> = (artistRes as any)?.results || [];
+
+  let artistTopSongs: JioSaavnSongRaw[] = [];
+  if (artists.length > 0) {
+    // Prioritize exact artist match, then prefix match
+    let matchedArtist = artists.find(a => (a.name || a.title || '').trim().toLowerCase() === qLower);
+    if (!matchedArtist) {
+      matchedArtist = artists.find(a => (a.name || a.title || '').trim().toLowerCase().startsWith(qLower));
+    }
+
+    if (matchedArtist?.id) {
+      const pageUrl = new URL(JIOSAAVN_ENDPOINT);
+      pageUrl.searchParams.set('__call', 'artist.getArtistPageDetails');
+      pageUrl.searchParams.set('_format', 'json');
+      pageUrl.searchParams.set('_marker', '0');
+      pageUrl.searchParams.set('api_version', '4');
+      pageUrl.searchParams.set('ctx', 'web6dot0');
+      pageUrl.searchParams.set('artistId', matchedArtist.id);
+
+      try {
+        const pageRes = await fetch(pageUrl.toString(), {
+          headers: { 'User-Agent': getRandomUserAgent(), Accept: 'application/json, text/plain, */*' },
+        }).then(r => (r.ok ? r.json() : null));
+        if (pageRes && Array.isArray(pageRes.topSongs)) {
+          artistTopSongs = pageRes.topSongs;
+        }
+      } catch {
+        // Fallback to song results
+      }
+    }
   }
 
-  const data = (await res.json()) as JioSaavnSearchResponse;
-  const results = data.results || [];
-  return results.map((item) => formatTrack(item, quality));
+  // Combine artist top songs first, followed by general song results, deduplicated
+  const seenIds = new Set<string>();
+  const combinedTracks: NeonSongTrack[] = [];
+
+  for (const raw of [...artistTopSongs, ...rawSongResults]) {
+    if (raw && raw.id && !seenIds.has(raw.id)) {
+      seenIds.add(raw.id);
+      combinedTracks.push(formatTrack(raw, quality));
+    }
+  }
+
+  return combinedTracks;
 }
 
 /**
