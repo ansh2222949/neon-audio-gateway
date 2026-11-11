@@ -39,7 +39,7 @@ app.get('/health', (c) => {
   return c.json({
     status: 'ok',
     engine: 'Neon Music Core',
-    version: '1.0.0',
+    version: '1.3.0',
     decipher: 'Zero-Allocation DES-ECB',
     maxBitrate: '320kbps AAC',
     supportedClients: ['Neon Song App', 'Stremio', 'Web Dashboard'],
@@ -61,7 +61,7 @@ app.get('/manifest.json', (c) => {
         type: 'select',
         default: '320',
         options: [
-          { label: '320 kbps Ultra (Direct CDN)', value: '320' },
+          { label: '320 kbps Master (Direct CDN)', value: '320' },
           { label: '160 kbps High (Balanced)', value: '160' },
           { label: '96 kbps Data Saver', value: '96' },
         ],

@@ -1,6 +1,6 @@
 {
   "name": "neon-audio-gateway",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "High-performance modular audio gateway & streaming resolver for Neon Song and Stremio",
   "type": "module",
   "main": "src/index.ts",
