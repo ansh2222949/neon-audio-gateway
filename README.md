@@ -1,12 +1,27 @@
 # ⚡ Neon Audio Gateway (`neon-audio-gateway`)
 
-> High-performance, modular **Audio Streaming Resolver & Gateway** built on [Hono](https://hono.dev). Engineered for [Neon Song](https://github.com/ansh2222949/Neon-song) and [Stremio](https://stremio.com).
+> **High-performance, Edge-Native Audio Streaming Resolver & Spatial Web Player** built on [Hono](https://hono.dev). Engineered for [Neon Song](https://github.com/ansh2222949/Neon-song) (Android) and [Stremio](https://stremio.com).
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ansh2222949/neon-audio-gateway)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fansh2222949%2Fneon-audio-gateway)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Framework: Hono](https://img.shields.io/badge/Framework-Hono%20v4-E36002.svg)](https://hono.dev)
-[![Audio Quality](https://img.shields.io/badge/Audio-320kbps%20AAC-00f0ff.svg)](#)
+<p align="left">
+  <a href="https://hono.dev"><img src="https://img.shields.io/badge/Framework-Hono%20v4-E36002?style=for-the-badge&logo=hono&logoColor=white" alt="Hono v4" /></a>
+  <a href="https://workers.cloudflare.com"><img src="https://img.shields.io/badge/Runtime-Cloudflare%20Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Workers" /></a>
+  <a href="https://typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <a href="https://github.com/ansh2222949/Neon-song"><img src="https://img.shields.io/badge/Client-Neon%20Song%20Android-00D26A?style=for-the-badge&logo=android&logoColor=white" alt="Neon Song Android" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" /></a>
+</p>
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Audio-320kbps%20Master%20AAC-00f0ff?style=flat-square" alt="320kbps Audio" />
+  <img src="https://img.shields.io/badge/UI-visionOS%20Spatial%20Glass-black?style=flat-square&logo=apple" alt="Spatial Glass UI" />
+  <img src="https://img.shields.io/badge/Search-Smart%20Artist%20%26%20Track%20Resolver-8A2BE2?style=flat-square" alt="Smart Search" />
+  <img src="https://img.shields.io/badge/Latency-%3C15ms%20Cold%20Start-30D158?style=flat-square" alt="Ultra Low Latency" />
+</p>
+
+<p align="left">
+  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/ansh2222949/neon-audio-gateway"><img src="https://deploy.workers.cloudflare.com/button" alt="Deploy to Cloudflare Workers" /></a>
+  &nbsp;
+  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fansh2222949%2Fneon-audio-gateway"><img src="https://vercel.com/button" alt="Deploy with Vercel" /></a>
+</p>
 
 ---
 
@@ -14,7 +29,7 @@
 
 Traditional streaming addons and resolvers rely on slow, memory-intensive script engines that convert bytes into bit arrays (`[0, 1, 0, 1]`) and allocate thousands of temporary heap objects per track decryption. 
 
-**Neon Music Core** redesigns this pipeline from the ground up:
+**Neon Audio Gateway** redesigns this pipeline from the ground up:
 
 1. **⚡ Zero-Allocation DES Deciphering**:
    - Precomputes 16-round subkeys for JioSaavn's static key (`38346591`) on startup.
@@ -26,14 +41,19 @@ Traditional streaming addons and resolvers rely on slow, memory-intensive script
    - Upgrades default streams to true **320 kbps AAC (`mp4a` container)** with multi-bitrate fallback (`160 kbps`, `96 kbps`).
    - Supports HTTP Range requests for instant, buffer-free seeking.
 
-3. **🔄 Unified Dual-Protocol Compatibility**:
-   - **Neon Song Native Module**: `/manifest.json`, `/search`, `/stream/:id`.
-   - **Stremio Addon Protocol**: Full support for Stremio catalog discovery, track metadata, and direct streams (`/catalog/...`, `/meta/...`, `/stream/...`).
+3. **🔍 Smart Multi-Entity Search Engine**:
+   - Parallel query resolution querying both track titles and artist catalogs simultaneously.
+   - Intelligent Japanese / Global artist phonetic mapping (e.g., `Ado`, `9lane` -> `9Lana`, anime sound tracks).
+   - Resolves top artist hits directly from verified artist discographies when searching by artist name.
 
-4. **✨ Cyberpunk Web Dashboard & Live Stream Tester**:
-   - Integrated dark OLED web console at `/` matching the Neon Song design language.
-   - Built-in live search and HTML5 audio player allowing immediate track testing right in your browser.
-   - One-click copy buttons for Neon Song and Stremio installation.
+4. **✨ visionOS & Apple Spatial Frosted Glass Web Player**:
+   - Immersive full-screen player with dynamic album artwork mesh gradients (`blur(110px) saturate(220%)`).
+   - **Apple Music Sing** synced lyrics experience with live focus luminescence and background line blur.
+   - Real-time bit-rate selector (`320kbps Master`, `160kbps High`, `96kbps Eco`), live audio visualizer spectrum, queue drawer, and keyboard shortcuts (`Space`, `⌘K`, `L`).
+
+5. **🔄 Unified Dual-Protocol Compatibility**:
+   - **Neon Song Native Module**: `/manifest.json`, `/search`, `/stream/:id`, `/recommendations/:id`, `/lyrics/:id`.
+   - **Stremio Addon Protocol**: Full support for Stremio catalog discovery, track metadata with rich 500x500 posters, and direct playback streams (`/catalog/...`, `/meta/...`, `/stream/...`).
 
 ---
 
